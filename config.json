@@ -1,0 +1,16 @@
+{
+  "timelapse":false,
+  "timelapse_location":"/home/pi/camsec/timelapse/",
+  "timelapse_frequency":10,
+  "email":"ranjiniare@gmail.com",
+  "resolution":[1024,768],
+  "frequency":"p1",
+  "storage":"/home/pi/camsec/snap/",
+  "TextMessageFile":"/home/pi/camsec/message.txt",
+  "basicSubject":"RasppyTesco Alert",
+  "notification_method":{
+    "p1":["mail","dropbox","twitter"],
+    "p2":["twitter"]
+  },
+  "camera_iso":100
+}
