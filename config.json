@@ -4,7 +4,7 @@
   "timelapse_frequency":10,
   "email":"ranjiniare@gmail.com",
   "resolution":[1024,768],
-  "frequency":"p1",
+  "frequency":0.5,
   "storage":"/home/pi/camsec/snap/",
   "TextMessageFile":"/home/pi/camsec/message.txt",
   "basicSubject":"RasppyTesco Alert",
