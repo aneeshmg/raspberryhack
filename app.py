@@ -13,6 +13,7 @@ import time
 from picamera import PiCamera
 from subprocess import call
 import subprocess
+from SimpleCV import Image
 
 ''' Imports done '''
 
@@ -46,7 +47,7 @@ def TakePic():
     camera.capture(c.storage + str(latestIndex) + ".jpg")
 
 def getLatestImage():
-    return c.storage + getLatestImageId() + ".jpg"
+    return str(c.storage) + str(getLatestImageId()) + ".jpg"
 
 def MailSent():
     print "Mail sent to : " + c.email
@@ -54,6 +55,9 @@ def MailSent():
 ''' Initialisation '''
 
 camera = PiCamera()
+camera.resolution = (640, 480)
+camera.start_preview()
+time.sleep(5)
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(11,GPIO.IN)
@@ -67,15 +71,35 @@ while True:
     i=GPIO.input(11)
 
     if i==0:
-           print "No intruders",i
-           GPIO.output(3,0)
-           time.sleep(c.frequency)
+        #print "No intruders",i
+        GPIO.output(3,0)
+        #time.sleep(c.frequency)
 
 
     elif i==1:
-            print "Intruder detected",i
-            TakePic()
-            SendMail(getLatestImage())
-            GPIO.output(3,1)
-            time.sleep(c.frequency)
+        print "Intruder detected",i
+        TakePic()
+        foto = Image(getLatestImage())
+        facePresent = foto.findHaarFeatures('face.xml')
+        print str(facePresent)
+        if facePresent:
+            for trovato in facePresent:
+                print "face coordinates : " + str(trovato.coordinates())
+                trovato.draw()
+                print "intruder w face present"
+        else:
+            print "not a face"
+        ##SendMail(getLatestImage())
+        time.sleep(c.frequency)
 
+
+
+'''
+if trovati:
+    print "face present"
+    for trovato in trovati:
+        print "face coordinates : " + str(trovato.coordinates())
+        trovato.draw()
+else:
+    print "No face"
+'''
