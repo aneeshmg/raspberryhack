@@ -5,6 +5,7 @@ from picamera import PiCamera
 from time import sleep
 import json
 import os
+import glob
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -52,12 +53,17 @@ def getLatestImage():
 def MailSent():
     print "Mail sent to : " + c.email
 
+def CleanUp():
+    files = glob.glob(c.storage+"*")
+    for f in files:
+        os.remove(f)
+
 ''' Initialisation '''
 
 camera = PiCamera()
 camera.resolution = (640, 480)
 camera.start_preview()
-time.sleep(5)
+time.sleep(2)
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(11,GPIO.IN)
@@ -69,37 +75,23 @@ c = Config(configJson)
 
 while True:
     i=GPIO.input(11)
+    if int(getLatestImageId()) > 5:
+        CleanUp()
 
     if i==0:
-        #print "No intruders",i
         GPIO.output(3,0)
-        #time.sleep(c.frequency)
-
-
     elif i==1:
-        print "Intruder detected",i
+        print "Intruder detected"
         TakePic()
         foto = Image(getLatestImage())
         facePresent = foto.findHaarFeatures('face.xml')
-        print str(facePresent)
         if facePresent:
-            for trovato in facePresent:
-                print "face coordinates : " + str(trovato.coordinates())
-                trovato.draw()
-                print "intruder w face present"
+            for face in facePresent:
+                print "Face coordinates : " + str(face.coordinates())
+                print "Intruder with face present"
+                SendMail(getLatestImage())
         else:
-            print "not a face"
-        ##SendMail(getLatestImage())
+            print "Obstruction not a face"
+
         time.sleep(c.frequency)
 
-
-
-'''
-if trovati:
-    print "face present"
-    for trovato in trovati:
-        print "face coordinates : " + str(trovato.coordinates())
-        trovato.draw()
-else:
-    print "No face"
-'''
